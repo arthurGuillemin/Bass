@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Header from './components/header';
 import Aside from './components/aside';
 import MusicPlayerCard from './components/player';
+import Playlist from './components/playlist';
 
 const songs = [
   { title: 'Bad Bunny - DAKITI', file: "/src/songs/bad.mp3", img: "/src/assets/dakiti-cover.jpg" },
@@ -20,27 +21,39 @@ const songs = [
 
 function App() {
   const [selectedSong, setSelectedSong] = useState(null);
+  const [playlist, setPlaylist] = useState([]);
 
   const handleSelectSong = (song) => {
     setSelectedSong(song);
   };
+  const handleAddToPlaylist = (song) => {
+    setPlaylist((prevPlaylist) => [...prevPlaylist, song]);
+    if (playlist.length === 0) {
+      setSelectedSong(song);
+    }
+  };
 
   const playNextSong = () => {
-    const currentIndex = songs.findIndex(s => s.title === selectedSong.title);
-    const nextIndex = (currentIndex + 1) % songs.length;
-    setSelectedSong(songs[nextIndex]);
+    if (playlist.length > 0) {
+      const currentIndex = playlist.findIndex(s => s.title === selectedSong.title);
+      const nextIndex = (currentIndex + 1) % playlist.length;
+      setSelectedSong(playlist[nextIndex]);
+    }
   };
 
   const playPrevSong = () => {
-    const currentIndex = songs.findIndex(s => s.title === selectedSong.title);
-    const prevIndex = (currentIndex - 1 + songs.length) % songs.length;
-    setSelectedSong(songs[prevIndex]);
+    if (playlist.length > 0) {
+      const currentIndex = playlist.findIndex(s => s.title === selectedSong.title);
+      const prevIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+      setSelectedSong(playlist[prevIndex]);
+    }
   };
 
   return (
     <div className="App flex">
       <Header />
-      <Aside onSelectSong={handleSelectSong} songs={songs} />
+      <Aside onSelectSong={handleSelectSong} songs={songs} onAddToPlaylist={handleAddToPlaylist} />
+      <Playlist playlist={playlist} />
       <MusicPlayerCard songs={songs} song={selectedSong} onNext={playNextSong} onPrev={playPrevSong} />
     </div>
   );
